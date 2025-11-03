@@ -62,9 +62,6 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <header className="text-center mb-16 pt-8">
-          <div className="inline-block mb-4 p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl backdrop-blur-sm border border-blue-500/30">
-            <div className="text-5xl">🎨</div>
-          </div>
           <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-4 tracking-tight">
             Generative UI Charts
           </h1>
@@ -80,7 +77,9 @@ export default function HomePage() {
             <div className="bg-gradient-to-br from-red-900/40 to-red-950/40 backdrop-blur-xl border border-red-500/50 rounded-2xl p-6 mb-6 shadow-xl shadow-red-500/10 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">❌</span>
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-red-300 mb-2 text-lg">Erro ao processar</h3>
@@ -95,7 +94,9 @@ export default function HomePage() {
             <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-slate-700/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">✅</span>
+                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
                 Resposta da API
               </h3>
@@ -104,8 +105,7 @@ export default function HomePage() {
               {response.charts && response.charts.length > 0 && (
                 <div className="space-y-6">
                   <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/50 rounded-xl p-5 backdrop-blur-sm">
-                    <p className="text-green-300 font-semibold text-lg flex items-center gap-2">
-                      <span className="text-2xl">✨</span>
+                    <p className="text-green-300 font-semibold text-lg">
                       {response.charts.length} gráfico(s) gerado(s) com sucesso!
                     </p>
                   </div>
@@ -140,8 +140,7 @@ export default function HomePage() {
                       </div>
 
                       <div className="mt-5">
-                        <p className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
-                          <span>📊</span>
+                        <p className="text-sm font-semibold text-gray-400 mb-3">
                           Dados:
                         </p>
                         <div className="bg-slate-950/70 rounded-lg p-4 overflow-x-auto border border-slate-700/50">
@@ -158,7 +157,6 @@ export default function HomePage() {
               {/* Raw JSON */}
               <details className="mt-8 group">
                 <summary className="cursor-pointer text-gray-400 hover:text-white transition-colors font-semibold flex items-center gap-2 p-4 bg-slate-900/50 rounded-lg border border-slate-700/50 hover:border-blue-500/30">
-                  <span>📋</span>
                   Ver JSON completo
                   <span className="ml-auto text-xs opacity-0 group-hover:opacity-100 transition-opacity">Clique para expandir</span>
                 </summary>
@@ -175,8 +173,7 @@ export default function HomePage() {
           <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl shadow-2xl p-8 mb-6 border border-slate-700/50 hover:border-blue-500/30 transition-all duration-300">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-200 mb-3 flex items-center gap-2">
-                  <span className="text-xl">✍️</span>
+                <label htmlFor="message" className="block text-sm font-semibold text-gray-200 mb-3">
                   Digite sua solicitação de gráfico
                 </label>
                 <textarea
@@ -205,10 +202,7 @@ export default function HomePage() {
                       Processando...
                     </span>
                   ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <span>🚀</span>
-                      Gerar Gráfico
-                    </span>
+                    'Gerar Gráfico'
                   )}
                 </button>
 
@@ -218,10 +212,7 @@ export default function HomePage() {
                   disabled={loading}
                   className="bg-slate-700/50 hover:bg-slate-600/50 disabled:bg-slate-800/50 disabled:cursor-not-allowed text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 border border-slate-600/50 hover:border-slate-500/50 backdrop-blur-sm"
                 >
-                  <span className="flex items-center gap-2">
-                    <span>🗑️</span>
-                    Limpar
-                  </span>
+                  Limpar
                 </button>
               </div>
             </form>
@@ -229,26 +220,22 @@ export default function HomePage() {
 
           {/* Examples */}
           <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl shadow-2xl p-6 mb-6 border border-slate-700/50">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <span className="text-xl">💡</span>
+            <h3 className="text-lg font-bold text-white mb-4">
               Exemplos de Solicitações
             </h3>
             <div className="grid gap-3">
               {[
-                { icon: '📊', text: 'Crie um gráfico de barras com vendas: A=100, B=200, C=300' },
-                { icon: '📈', text: 'Mostre um gráfico de linha com temperatura por mês: Jan=10, Fev=15, Mar=20' },
-                { icon: '🥧', text: 'Faça um gráfico de pizza com distribuição: Mobile=40%, Desktop=35%, Tablet=25%' },
+                'Crie um gráfico de barras com vendas: A=100, B=200, C=300',
+                'Mostre um gráfico de linha com temperatura por mês: Jan=10, Fev=15, Mar=20',
+                'Faça um gráfico de pizza com distribuição: Mobile=40%, Desktop=35%, Tablet=25%',
               ].map((example, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setMessage(example.text)}
+                  onClick={() => setMessage(example)}
                   disabled={loading}
-                  className="w-full text-left px-5 py-3 bg-slate-900/50 hover:bg-slate-800/50 text-gray-300 hover:text-white rounded-xl transition-all duration-200 text-sm border border-slate-700/50 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10 group"
+                  className="w-full text-left px-5 py-3 bg-slate-900/50 hover:bg-slate-800/50 text-gray-300 hover:text-white rounded-xl transition-all duration-200 text-sm border border-slate-700/50 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10"
                 >
-                  <span className="flex items-start gap-3">
-                    <span className="text-lg group-hover:scale-110 transition-transform">{example.icon}</span>
-                    <span className="flex-1">{example.text}</span>
-                  </span>
+                  {example}
                 </button>
               ))}
             </div>
@@ -259,12 +246,10 @@ export default function HomePage() {
         <footer className="text-center mt-16 pb-8">
           <div className="bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/30 max-w-2xl mx-auto">
             <p className="text-gray-400 flex items-center justify-center gap-2 mb-3">
-              <span className="text-lg">🔧</span>
               <span>Endpoint:</span>
               <code className="bg-slate-950/70 px-3 py-1.5 rounded-lg text-blue-400 font-mono text-sm border border-slate-700/50">/api</code>
             </p>
-            <p className="text-gray-500 text-sm flex items-center justify-center gap-2">
-              <span className="text-base">📚</span>
+            <p className="text-gray-500 text-sm">
               Guia de Implementação - <span className="text-blue-400 font-semibold">Etapa 1: AI Endpoint</span>
             </p>
           </div>
