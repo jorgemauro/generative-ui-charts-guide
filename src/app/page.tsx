@@ -5,29 +5,50 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartRenderer } from '@/components/charts/ChartRenderer';
-import { ChartRequest } from '@/lib/llm-service';
+import { ChartHistory } from '@/components/ChartHistory';
+import { ChartRequest, ChatMessage } from '@/lib/llm-service';
+import { useChartHistory, ChartVersion, HistoryItem } from '@/hooks/useChartHistory';
 import { Loader2, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [userInput, setUserInput] = useState('');
   const [charts, setCharts] = useState<ChartRequest[]>([]);
+  const [currentHistoryId, setCurrentHistoryId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    history,
+    isLoaded: historyLoaded,
+    addNewChart,
+    addVersion,
+    removeFromHistory,
+    clearHistory,
+  } = useChartHistory();
 
   const handleGenerateChart = async () => {
     if (!userInput.trim()) return;
 
+    const messageText = userInput.trim();
     setIsLoading(true);
     setError(null);
+
+    // Criar mensagem do usuário
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: messageText,
+      timestamp: Date.now(),
+    };
 
     try {
       const response = await fetch('/api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          message: userInput,
-          chatHistory: [],
-          currentCharts: null
+          message: messageText,
+          chatHistory: messages,
+          currentCharts: charts.length > 0 ? charts : undefined,
         }),
       });
 
@@ -37,7 +58,31 @@ export default function Home() {
         setError(result.error);
         setCharts([]);
       } else {
-        setCharts(result.charts);
+        const { charts: newCharts, isAdjustment, explanation } = result;
+        
+        // Criar mensagem do assistente
+        const assistantMessage: ChatMessage = {
+          role: 'assistant',
+          content: explanation || 'Gráfico criado com sucesso!',
+          timestamp: Date.now(),
+          chartData: newCharts,
+        };
+
+        // Atualizar histórico de mensagens
+        const updatedMessages = [...messages, userMessage, assistantMessage];
+        setMessages(updatedMessages);
+        setCharts(newCharts);
+
+        // Gerenciar histórico de gráficos
+        if (isAdjustment && currentHistoryId) {
+          // Adicionar como nova versão do gráfico atual
+          addVersion(currentHistoryId, messageText, newCharts, true, updatedMessages);
+        } else {
+          // Criar novo item no histórico
+          const newHistoryId = addNewChart(messageText, newCharts, updatedMessages);
+          setCurrentHistoryId(newHistoryId);
+        }
+
         setUserInput('');
       }
     } catch (err) {
@@ -45,6 +90,14 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLoadFromHistory = (item: HistoryItem, version?: ChartVersion) => {
+    const selectedVersion = version || item.versions[item.versions.length - 1];
+    setCharts(selectedVersion.charts);
+    setMessages(item.messages || []);
+    setCurrentHistoryId(item.id);
+    setError(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -58,14 +111,16 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-2">
-            UI Generativa - Etapa 2
+            UI Generativa - Etapa 3
           </h1>
           <p className="text-gray-400">
-            Componentes de gráficos com Recharts
+            Histórico e contexto conversacional
           </p>
         </header>
         
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {/* Coluna Principal - 2/3 */}
+          <div className="lg:col-span-2 space-y-8">
           {/* Error Display */}
           {error && (
             <Card className="border-red-500/50 bg-red-900/20 backdrop-blur">
@@ -179,7 +234,21 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
+          </div>
 
+          {/* Sidebar - Histórico - 1/3 */}
+          <div className="lg:col-span-1">
+            {historyLoaded && (
+              <div className="sticky top-8">
+                <ChartHistory
+                  history={history}
+                  onSelectItem={handleLoadFromHistory}
+                  onRemoveItem={removeFromHistory}
+                  onClearHistory={clearHistory}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
