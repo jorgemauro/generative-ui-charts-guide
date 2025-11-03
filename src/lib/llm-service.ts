@@ -38,6 +38,14 @@ export interface LLMResponseWithIntent extends LLMResponse {
   explanation?: string; // Explicação da intenção detectada
 }
 
+// Dados de arquivo carregado
+export interface FileData {
+  filename: string;
+  data: Array<Record<string, any>>;
+  columns: string[];
+  rowCount: number;
+}
+
 export class LLMService {
   /**
    * Gera ou ajusta gráfico com base no contexto da conversa
@@ -45,15 +53,25 @@ export class LLMService {
   static async generateOrAdjustChart(
     userMessage: string,
     chatHistory: ChatMessage[],
-    currentCharts?: ChartRequest[]
+    currentCharts?: ChartRequest[],
+    fileData?: FileData
   ): Promise<LLMResponseWithIntent> {
     try {
       const hasCurrentChart = currentCharts && currentCharts.length > 0;
+      
+      // Preparar string de dados do arquivo se houver
+      let fileDataString: string | undefined;
+      if (fileData) {
+        // Usar FileParser para converter dados em string
+        // Import dinâmico para evitar carregar se não necessário
+        const { FileParser } = await import('./file-parser');
+        fileDataString = FileParser.dataToString(fileData, 15);
+      }
 
       // Construir prompt contextual usando funções helper
       const systemPrompt = buildContextualPrompt(
-        false,
-        undefined,
+        !!fileData,
+        fileDataString,
         hasCurrentChart,
         currentCharts
       );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LLMService, ChatMessage } from '@/lib/llm-service';
+import { LLMService, ChatMessage, FileData } from '@/lib/llm-service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +7,8 @@ export async function POST(request: NextRequest) {
     const { 
       message: userMessage, 
       chatHistory, 
-      currentCharts
+      currentCharts,
+      fileData
     } = body;
 
     // Validações
@@ -33,7 +34,8 @@ export async function POST(request: NextRequest) {
     const result = await LLMService.generateOrAdjustChart(
       userMessage,
       history,
-      currentCharts
+      currentCharts,
+      fileData as FileData | undefined
     );
 
     if (result.error) {

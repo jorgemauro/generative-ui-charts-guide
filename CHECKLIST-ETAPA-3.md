@@ -9,6 +9,7 @@
 - ✅ `LLMResponseWithIntent` interface (já existia)
 - ✅ `ChartVersion` interface (criado em useChartHistory.ts)
 - ✅ `HistoryItem` interface (criado em useChartHistory.ts)
+- ✅ `FileData` interface (criado em llm-service.ts e file-parser.ts)
 
 **2. Sistema de Prompts**
 - ✅ `CHAT_GENERATION_PROMPT` (já existia em chat-prompt.ts)
@@ -47,12 +48,36 @@
 - ✅ Já está preparado para receber contexto
 - ✅ Recebe `chatHistory`
 - ✅ Recebe `currentCharts`
+- ✅ Recebe `fileData`
 - ✅ Passa para `generateOrAdjustChart()`
 
-**7. Página Principal**
+**7. Upload de Arquivos**
+- ✅ Biblioteca `papaparse` (v5.4.1) instalada
+- ✅ Biblioteca `xlsx` (v0.20.2) instalada sem vulnerabilidades
+- ✅ `FileParser` criado em `src/lib/file-parser.ts`
+- ✅ Validação de tamanho (max 10MB)
+- ✅ Validação de tipo (CSV, XLSX, XLS)
+- ✅ Validação de linhas (max 10.000)
+- ✅ Parse de CSV com PapaParse
+- ✅ Parse de Excel com XLSX (import dinâmico)
+- ✅ Detecção de colunas numéricas
+- ✅ Geração de sugestões de gráfico
+- ✅ Conversão de dados para string (para LLM)
+- ✅ `FileUpload` componente criado
+- ✅ Interface drag & drop funcional
+- ✅ Preview de arquivo carregado
+- ✅ Tratamento de erros
+- ✅ Integração com página principal
+- ✅ Arquivos de exemplo criados em `/exemplos`
+- ✅ Documentação completa em `FUNCIONALIDADE-UPLOAD.md`
+
+**8. Página Principal (page.tsx)**
 - ✅ Import do `useChartHistory`
 - ✅ Import do `ChartHistory`
+- ✅ Import do `FileUpload`
+- ✅ Import do `FileParser`
 - ✅ Estados para gerenciar histórico
+- ✅ Estado `fileData` para arquivo carregado
 - ✅ `handleGenerateChart()` atualizado
 - ✅ `handleLoadFromHistory()` implementado
 - ✅ Layout com grid (2/3 main + 1/3 sidebar)

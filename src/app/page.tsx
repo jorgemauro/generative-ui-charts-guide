@@ -6,7 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartRenderer } from '@/components/charts/ChartRenderer';
 import { ChartHistory } from '@/components/ChartHistory';
-import { ChartRequest, ChatMessage } from '@/lib/llm-service';
+import { FileUpload } from '@/components/FileUpload';
+import { ChartRequest, ChatMessage, FileData } from '@/lib/llm-service';
+import { FileParser } from '@/lib/file-parser';
 import { useChartHistory, ChartVersion, HistoryItem } from '@/hooks/useChartHistory';
 import { Loader2, Sparkles } from 'lucide-react';
 
@@ -15,6 +17,7 @@ export default function Home() {
   const [charts, setCharts] = useState<ChartRequest[]>([]);
   const [currentHistoryId, setCurrentHistoryId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [fileData, setFileData] = useState<FileData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,6 +52,7 @@ export default function Home() {
           message: messageText,
           chatHistory: messages,
           currentCharts: charts.length > 0 ? charts : undefined,
+          fileData: fileData || undefined,
         }),
       });
 
@@ -98,6 +102,19 @@ export default function Home() {
     setMessages(item.messages || []);
     setCurrentHistoryId(item.id);
     setError(null);
+  };
+
+  const handleFileLoaded = (data: FileData) => {
+    setFileData(data);
+    setError(null);
+    
+    // Sugerir prompt baseado nos dados
+    const suggestion = FileParser.suggestChart(data);
+    setUserInput(suggestion);
+  };
+
+  const handleFileClear = () => {
+    setFileData(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -155,53 +172,20 @@ export default function Home() {
             </div>
           )}
 
-          {/* Examples - Show only when no charts */}
-          {charts.length === 0 && !error && (
-            <Card className="border-slate-700 bg-slate-900/30 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="text-white">Exemplos de Gráficos</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-gray-400 text-sm mb-4">
-                  Clique em um exemplo para preencher o campo:
-                </p>
-                <div className="grid gap-3">
-                  <button
-                    onClick={() => setUserInput('Crie um gráfico de barras com vendas trimestrais: Q1=15000, Q2=23000, Q3=19000, Q4=31000')}
-                    className="text-left px-4 py-3 bg-slate-800/50 hover:bg-slate-700/50 text-gray-300 hover:text-white rounded-lg transition-all duration-200 border border-slate-700 hover:border-blue-500/50 group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl group-hover:scale-110 transition-transform">📊</div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-white mb-1">Gráfico de Barras</div>
-                        <div className="text-sm text-gray-400">Vendas trimestrais: Q1, Q2, Q3, Q4</div>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => setUserInput('Mostre a evolução de usuários ativos: Janeiro=1200, Fevereiro=1850, Março=2400, Abril=3100, Maio=4200')}
-                    className="text-left px-4 py-3 bg-slate-800/50 hover:bg-slate-700/50 text-gray-300 hover:text-white rounded-lg transition-all duration-200 border border-slate-700 hover:border-blue-500/50 group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl group-hover:scale-110 transition-transform">📈</div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-white mb-1">Gráfico de Linha</div>
-                        <div className="text-sm text-gray-400">Evolução mensal de usuários ativos</div>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Input Form */}
           <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
             <CardHeader>
               <CardTitle className="text-white">Descreva seu gráfico</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* File Upload Integrado */}
+              <FileUpload
+                onFileLoaded={handleFileLoaded}
+                onClear={handleFileClear}
+                currentFile={fileData}
+                compact={true}
+              />
+              
               <Textarea
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
